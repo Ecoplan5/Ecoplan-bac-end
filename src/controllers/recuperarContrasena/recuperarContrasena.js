@@ -56,7 +56,7 @@ const solicitarRestablecimiento = async (req, res) => {
 
     if (!usuario) {
       // return res.status(404).json({ mensaje: 'P003 - E003 Usuario no encontrado' });
-            return res.status(404).json({ mensaje: 'P003 - E003 ' });
+      return res.status(404).json({ mensaje: 'P003 - E003 ' });
 
     }
 
@@ -111,9 +111,14 @@ const enviarCorreoRecuperacion = async (correoDestino, token, credenciales) => {
     const nombreUsuario = usuario.nombre_usuario;
 
     // Construir el contenido del correo electrónico con el nombre del usuario
-    const mensajeCorreo = `¡¡Hola ${nombreUsuario}!! No te preocupes. \n\nHaz clic en el siguiente enlace para restablecer tu contraseña: http://localhost:3001/newPassword?token=${token}`;
+    const mensajeCorreo = `¡¡Hola ${nombreUsuario}!! No te preocupes. 
+    Haz clic en el siguiente enlace para restablecer tu contraseña: 
+    http://127.0.0.1:5500/cambiarContrasena.html?token=${encodeURIComponent(token)}`;
 
-    // Configuración del contenido del correo electrónico
+
+
+    console.log(`token generado: ${token}`);
+    // Configuración del contenido del correo electrónic
     const mailOptions = {
       from: credenciales.usuario,
       to: correoDestino,

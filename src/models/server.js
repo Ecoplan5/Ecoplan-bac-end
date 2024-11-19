@@ -43,6 +43,9 @@ class Server {
 
     // Configura el middleware para analizar el cuerpo de las solicitudes
     middlewares() {
+
+     
+
         this.app.use(express.json()); // Analiza cuerpos JSON
         this.app.use(express.urlencoded({ extended: true })); // Analiza cuerpos URL-encoded
         this.app.use(cors()); // Habilita CORS (si es necesario)
