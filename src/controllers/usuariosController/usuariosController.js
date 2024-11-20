@@ -110,7 +110,7 @@ const putUsuario = async (req, res = response) => {
     if (!usuario) {
       return res
         .status(404)
-        .json({ error: ` P002 - E002 No se encontró un elemento de Usuario con ID ${id}` });
+        .json({ error: `No se encontró un elemento de Usuario con ID ${id}` });
     }
 
     // Validar si se está intentando cambiar el nombre de usuario (ignorando mayúsculas/minúsculas)
@@ -125,20 +125,20 @@ const putUsuario = async (req, res = response) => {
       if (existingUsername) {
         return res
           .status(400)
-          .json({ error: " P002 - E002 El nombre de usuario ya está en uso" });
+          .json({ error: "El nombre de usuario ya está en uso" });
       }
     }
 
     // Validar si se está intentando cambiar el correo
-    if (updatedData.correo && updatedData.correo !== usuario.correo) {
+    if (updatedData.email && updatedData.email !== usuario.email) {
       const existingEmail = await Usuario.findOne({
-        where: { correo: updatedData.correo },
+        where: { email: updatedData.email },
       });
 
       if (existingEmail) {
         return res
           .status(400)
-          .json({ error: " P002 - E002 El correo electrónico ya está en uso" });
+          .json({ error: "El correo electrónico ya está en uso" });
       }
     }
 
@@ -148,7 +148,7 @@ const putUsuario = async (req, res = response) => {
     console.error(error);
     res
       .status(500)
-      .json({ error: " P002 - E002 Error al actualizar el elemento de Usuario" });
+      .json({ error: "Error al actualizar el elemento de Usuario" });
   }
 };
 
@@ -165,85 +165,67 @@ const deleteUsuario = async (req, res = response) => {
     } else {
       res
         .status(404)
-        .json({ error: ` P002 - E002 No se encontró un elemento de usuario con ID ${id}` });
+        .json({ error: `  No se encontró un elemento de usuario con ID ${id}` });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: " P002 - E002 Error al eliminar el elemento de usuario" });
+    res.status(500).json({ error: " Error al eliminar el elemento de usuario" });
   }
 };
 
 const actualizarPerfil = async (req, res) => {
   try {
-    // Desestructuramos los datos recibidos en el cuerpo de la solicitud
-    const { nombre, correo, nuevaContrasena } = req.body;
+    const { nombre, email, nuevaContrasena } = req.body;
 
-    console.log("Payload recibido:", { nombre, correo, nuevaContrasena });
-
-    // Verificamos la cabecera de autorización
+    // Verifica y decodifica el token de autenticación
     const authorizationHeader = req.headers["authorization"];
+
     if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
-      console.error("Token no válido o ausente");
       return res.status(401).json({ mensaje: "Token no válido" });
     }
 
-    // Extraemos el token y lo decodificamos
     const token = authorizationHeader.split(" ")[1];
     const decodedToken = jwt.verify(token, "secreto-seguro");
 
-    console.log("Token decodificado:", decodedToken);
-
-    // Buscamos al usuario en la base de datos
+    // Busca al usuario por ID (utilizando el ID del token decodificado)
     const usuario = await Usuario.findOne({
       where: { nombre_usuario: decodedToken.nombre_usuario },
     });
 
     if (!usuario) {
-      console.error("Usuario no encontrado:", decodedToken.nombre_usuario);
-      return res.status(404).json({ mensaje: "P002 - E002 Usuario no encontrado" });
+      return res
+        .status(404)
+        .json({ mensaje: " P002 - E002 Usuario no encontrado", decodedToken });
     }
 
-    console.log("Usuario encontrado:", usuario);
-
-    // Actualizamos los campos del perfil
+    // Actualiza los campos del perfil
     usuario.nombre_usuario = nombre || usuario.nombre_usuario;
-    usuario.email = correo || usuario.email;
+    usuario.email = email || usuario.email;
 
-    // Actualizamos la contraseña si se proporciona
+    // Actualiza la contraseña si se proporciona una nueva
     if (nuevaContrasena) {
       const hashedContrasena = await bcrypt.hash(nuevaContrasena, 10);
       usuario.contrasena = hashedContrasena;
     }
 
-    // Log para verificar los valores antes de guardar
-    console.log("Valores antes de guardar:", {
-      nombre_usuario: usuario.nombre_usuario,
-      email: usuario.email,
-      contrasena: nuevaContrasena ? "Actualizada" : "No modificada",
-    });
-
-    // Guardamos los cambios
+    // Guarda los cambios en la base de datos
     await usuario.save();
 
     res.json({ mensaje: "Perfil actualizado con éxito" });
   } catch (error) {
     console.error("Error al actualizar el perfil:", error);
-
-    // Manejo de errores específicos de Sequelize
     if (error.name === "SequelizeUniqueConstraintError") {
       if (error.fields.nombre_usuario) {
         return res
           .status(400)
-          .json({ mensaje: "P002 - E002 El nombre de usuario ya está en uso" });
+          .json({ mensaje: " P002 - E002El nombre de usuario ya está en uso" });
       } else if (error.fields.email) {
         return res
           .status(400)
-          .json({ mensaje: "P002 - E002 El correo electrónico ya está en uso" });
+          .json({ mensaje: " P002 - E002 El correo electrónico ya está en uso" });
       }
     }
-
-    // Respuesta genérica para otros errores
-    res.status(500).json({ mensaje: "P002 - E002 Error al actualizar el perfil" });
+    res.status(500).json({ mensaje: " P002 - E002 Error al actualizar el perfil" });
   }
 };
 
@@ -260,10 +242,10 @@ const actualizarEstadoUsuario = async (req, res = response) => {
 
       res.json({ mensaje: "Estado de usuario actualizado correctamente" });
     } else {
-      res.status(404).json({ error: ` P002 - E002 No se encontró un usuario con ID ${id}` });
+      res.status(404).json({ error: `No se encontró un usuario con ID ${id}` });
     }
   } catch (error) {
-    console.error(" P002 - E002 Error al actualizar estado de usuario:", error);
+    console.error("Error al actualizar estado de usuario:", error);
     res.status(500).json({ error: "Error al actualizar estado de usuario" });
   }
 };

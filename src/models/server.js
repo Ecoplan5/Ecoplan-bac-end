@@ -31,7 +31,7 @@ class Server {
         this.routes();
         this.createServer();
 
-        this.inicializarBaseDeDatos();
+        // this.inicializarBaseDeDatos();
 
         this.createServer();
     }
@@ -73,37 +73,37 @@ class Server {
         });
     }
 
-    async inicializarBaseDeDatos() {
-        try {
-            const cantidadRoles = await Rol.count();
-            const cantidadUsuarios = await Usuario.count();
+    // async inicializarBaseDeDatos() {
+    //     try {
+    //         const cantidadRoles = await Rol.count();
+    //         const cantidadUsuarios = await Usuario.count();
 
-            if (cantidadRoles === 0) {
-                await Rol.bulkCreate([
-                    { nombre: 'SuperAdmin', estado: 'Activo' },
-                    { nombre: 'Cliente', estado: 'Activo' }
-                ]);
-                console.log('Se ha creado el rol por defecto.');
-            }
+    //         if (cantidadRoles === 0) {
+    //             await Rol.bulkCreate([
+    //                 { nombre: 'SuperAdmin', estado: 'Activo' },
+    //                 { nombre: 'Cliente', estado: 'Activo' }
+    //             ]);
+    //             console.log('Se ha creado el rol por defecto.');
+    //         }
 
-            if (cantidadUsuarios === 0) {
-                // Encripta la contraseña antes de crear el usuario por defecto
-                const contrasenaEncriptada = await bcrypt.hash('12345678', 10);
+    //         if (cantidadUsuarios === 0) {
+    //             // Encripta la contraseña antes de crear el usuario por defecto
+    //             const contrasenaEncriptada = await bcrypt.hash('12345678', 10);
 
-                await Usuario.create({
-                    id_usuario: 1,
-                    id_rol: 1,
-                    nombre_usuario: 'Admin',
-                    contrasena: contrasenaEncriptada,
-                    email: 'ecoplan38@gmail.com',
-                    estado: 'Activo',
-                });
-                console.log('Se ha creado el usuario por defecto.');
-            }
-        } catch (error) {
-            console.error('Error al inicializar la base de datos:', error);
-        }
-    }
+    //             await Usuario.create({
+    //                 id_usuario: 1,
+    //                 id_rol: 1,
+    //                 nombre_usuario: 'Admin',
+    //                 contrasena: contrasenaEncriptada,
+    //                 email: 'ecoplan38@gmail.com',
+    //                 estado: 'Activo',
+    //             });
+    //             console.log('Se ha creado el usuario por defecto.');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error al inicializar la base de datos:', error);
+    //     }
+    // }
 
 
 

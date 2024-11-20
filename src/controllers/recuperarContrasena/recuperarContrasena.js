@@ -55,8 +55,7 @@ const solicitarRestablecimiento = async (req, res) => {
     const usuario = await Usuario.findOne({ where: { email } });
 
     if (!usuario) {
-      // return res.status(404).json({ mensaje: 'P003 - E003 Usuario no encontrado' });
-      return res.status(404).json({ mensaje: 'P003 - E003 ' });
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
 
     }
 
@@ -79,7 +78,7 @@ const solicitarRestablecimiento = async (req, res) => {
     res.json({ mensaje: 'Hemos enviado un correo de recuperación con éxito. Revisa tu bandeja de entrada o la carpeta de correo no deseado y sigue las instrucciones para restablecer tu contraseña.', resetToken });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ mensaje: ' P003 - E003 Error en la solicitud de restablecimiento de contraseña' });
+    res.status(500).json({ mensaje: ' Error en la solicitud de restablecimiento de contraseña' });
   }
 };
 
@@ -104,7 +103,7 @@ const enviarCorreoRecuperacion = async (correoDestino, token, credenciales) => {
 
     // Verificar si se encontró al usuario
     if (!usuario) {
-      throw new Error(` P003 - E003 Usuario con correo ${correoDestino} no encontrado`);
+      throw new Error(`Usuario con correo ${correoDestino} no encontrado`);
     }
 
     // Obtener el nombre del usuario
@@ -154,7 +153,7 @@ const cambiarContrasena = async (req, res) => {
 
     // Verifica si el usuario existe
     if (!usuario) {
-      return res.status(404).json({ mensaje: ' BP003 - E003 Usuario no encontrado' });
+      return res.status(404).json({ mensaje: ' Usuario no encontrado' });
     }
 
     // Hashea la nueva contraseña y actualiza en la base de datos
@@ -163,7 +162,7 @@ const cambiarContrasena = async (req, res) => {
 
     res.json({ mensaje: 'Contraseña cambiada con éxito' });
   } catch (error) {
-    console.error(' P003 - E003 Error al cambiar la contraseña:', error);
+    console.error('Error al cambiar la contraseña:', error);
     res.status(500).json({ mensaje: 'Error al cambiar la contraseña' });
   }
 };
