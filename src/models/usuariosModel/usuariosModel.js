@@ -9,10 +9,7 @@ const Usuario = sequelize.define('usuarios', {
         autoIncrement: true,
         primaryKey: true,
     },
-    id_rol: {
-        type: DataTypes.BIGINT,
-        allowNull: false,
-    },
+  
     nombre_usuario: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -42,6 +39,5 @@ const Usuario = sequelize.define('usuarios', {
         defaultValue: 'Activo',
       },
 });
-Usuario.belongsTo(Rol, { foreignKey: 'id_rol' });
 
 module.exports = Usuario;

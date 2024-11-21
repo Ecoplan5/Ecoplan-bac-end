@@ -1,6 +1,5 @@
 const Usuario = require('../../models/usuariosModel/usuariosModel');
 const { response } = require('express');
-const Rol = require('../../models/rolesModel/rolesModel');
 
 const { Sequelize } = require('sequelize');
 
@@ -12,13 +11,8 @@ const bcrypt = require('bcrypt');
 const getUsuarios = async (req, res = response) => {
   try {
     const usuarios = await Usuario.findAll({
-      include: [
-        {
-          model: Rol,
-
-        },
-
-      ],
+  
+    
     });
 
     res.json({ usuarios });
@@ -46,7 +40,7 @@ const getUsuarioByd = async (req, res = response) => {
 
       res.json(usuarioConImagen);
     } else {
-      res.status(404).json({ error: `No se encontró el usuario con ID ${id}` });
+      res.status(404).json({ error: `No se encontró el usuario con ID ${id_usuario}` });
     }
   } catch (error) {
     console.error(error);
@@ -58,8 +52,7 @@ const getUsuarioByd = async (req, res = response) => {
 
 // Crear un nuevo usuario
 const postUsuario = async (req, res = response) => {
-  // Incluye id_rol en el destructuring del request
-  const { nombre_usuario, contrasena, email, foto, id_rol } = req.body;
+  const { nombre_usuario, contrasena, email, foto } = req.body;
   console.log(req.body);  // Verifica que id_rol esté presente
 
   try {
@@ -82,7 +75,6 @@ const postUsuario = async (req, res = response) => {
       contrasena: contrasenaEncriptada,
       email,
       foto,
-      id_rol  // Asegúrate de incluir este campo
     });
 
     res.status(201).json({
@@ -101,16 +93,16 @@ const postUsuario = async (req, res = response) => {
 
 
 const putUsuario = async (req, res = response) => {
-  const { id } = req.params;
+  const { id_usuario } = req.params;
   const updatedData = req.body;
 
   try {
-    const usuario = await Usuario.findByPk(id);
+    const usuario = await Usuario.findByPk(id_usuario);
 
     if (!usuario) {
       return res
         .status(404)
-        .json({ error: `No se encontró un elemento de Usuario con ID ${id}` });
+        .json({ error: `No se encontró un elemento de Usuario con ID ${id_usuario}` });
     }
 
     // Validar si se está intentando cambiar el nombre de usuario (ignorando mayúsculas/minúsculas)
@@ -154,10 +146,10 @@ const putUsuario = async (req, res = response) => {
 
 
 const deleteUsuario = async (req, res = response) => {
-  const { id } = req.params;
+  const { id_usuario} = req.params;
 
   try {
-    const usuario = await Usuario.findByPk(id);
+    const usuario = await Usuario.findByPk(id_usuario);
 
     if (usuario) {
       await usuario.destroy();
@@ -165,7 +157,7 @@ const deleteUsuario = async (req, res = response) => {
     } else {
       res
         .status(404)
-        .json({ error: `  No se encontró un elemento de usuario con ID ${id}` });
+        .json({ error: `  No se encontró un elemento de usuario con ID ${id_usuario}` });
     }
   } catch (error) {
     console.error(error);
@@ -230,11 +222,11 @@ const actualizarPerfil = async (req, res) => {
 };
 
 const actualizarEstadoUsuario = async (req, res = response) => {
-  const { id } = req.params;
+  const { id_usuario } = req.params;
   const { estado } = req.body;
 
   try {
-    const usuario = await Usuario.findByPk(id);
+    const usuario = await Usuario.findByPk(id_usuario);
 
     if (usuario) {
       usuario.estado = estado;
@@ -242,7 +234,7 @@ const actualizarEstadoUsuario = async (req, res = response) => {
 
       res.json({ mensaje: "Estado de usuario actualizado correctamente" });
     } else {
-      res.status(404).json({ error: `No se encontró un usuario con ID ${id}` });
+      res.status(404).json({ error: `No se encontró un usuario con ID ${id_usuario}` });
     }
   } catch (error) {
     console.error("Error al actualizar estado de usuario:", error);
