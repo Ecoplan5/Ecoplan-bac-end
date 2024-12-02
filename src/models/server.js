@@ -3,8 +3,6 @@ const bcrypt = require('bcrypt');
 
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const Rol = require('./rolesModel/rolesModel');
-const Usuario = require('./usuariosModel/usuariosModel');
 const errorHandler = require('../../middlewares/errorHandler'); // Importa tu middleware de errores
 
 

@@ -11,10 +11,7 @@ const bcrypt = require('bcrypt');
 const getUsuarios = async (req, res = response) => {
   try {
     const usuarios = await Usuario.findAll({
-  
-    
     });
-
     res.json({ usuarios });
   } catch (error) {
     console.error(error);
@@ -48,9 +45,6 @@ const getUsuarioByd = async (req, res = response) => {
   }
 };
 
-
-
-// Crear un nuevo usuario
 const postUsuario = async (req, res = response) => {
   const { nombre_usuario, contrasena, email, foto } = req.body;
   console.log(req.body);  // Verifica que id_rol esté presente
@@ -58,6 +52,8 @@ const postUsuario = async (req, res = response) => {
   try {
     // Verificar si el usuario ya existe
     const usuarioExistente = await Usuario.findOne({ where: { email } });
+    console.log('Usuario encontrado:', usuarioExistente);
+    
     if (usuarioExistente) {
       return res.status(400).json({
         success: false,
@@ -69,7 +65,7 @@ const postUsuario = async (req, res = response) => {
     const salt = await bcrypt.genSalt(10);
     const contrasenaEncriptada = await bcrypt.hash(contrasena, salt);
 
-    // Crear el nuevo usuario incluyendo el campo id_rol
+    // Crear el nuevo usuario
     const nuevoUsuario = await Usuario.create({
       nombre_usuario,
       contrasena: contrasenaEncriptada,
@@ -90,6 +86,48 @@ const postUsuario = async (req, res = response) => {
     });
   }
 };
+
+
+// // Crear un nuevo usuario
+// const postUsuario = async (req, res = response) => {
+//   const { nombre_usuario, contrasena, email, foto } = req.body;
+//   console.log(req.body);  // Verifica que id_rol esté presente
+
+//   try {
+//     // Verificar si el usuario ya existe
+//     const usuarioExistente = await Usuario.findOne({ where: { email } });
+//     if (usuarioExistente) {
+//       return res.status(400).json({
+//         success: false,
+//         error: 'El correo electrónico ya está en uso.'
+//       });
+//     }
+
+//     // Encriptar la contraseña
+//     const salt = await bcrypt.genSalt(10);
+//     const contrasenaEncriptada = await bcrypt.hash(contrasena, salt);
+
+//     // Crear el nuevo usuario incluyendo el campo id_rol
+//     const nuevoUsuario = await Usuario.create({
+//       nombre_usuario,
+//       contrasena: contrasenaEncriptada,
+//       email,
+//       foto,
+//     });
+
+//     res.status(201).json({
+//       success: true,
+//       message: 'Usuario creado con éxito.',
+//       usuario: nuevoUsuario
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       success: false,
+//       error: 'Error al crear el usuario.'
+//     });
+//   }
+// };
 
 
 const putUsuario = async (req, res = response) => {
@@ -171,7 +209,6 @@ const actualizarPerfil = async (req, res) => {
 
     // Verifica y decodifica el token de autenticación
     const authorizationHeader = req.headers["authorization"];
-
     if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
       return res.status(401).json({ mensaje: "Token no válido" });
     }
@@ -179,7 +216,7 @@ const actualizarPerfil = async (req, res) => {
     const token = authorizationHeader.split(" ")[1];
     const decodedToken = jwt.verify(token, "secreto-seguro");
 
-    // Busca al usuario por ID (utilizando el ID del token decodificado)
+    // Busca al usuario por ID
     const usuario = await Usuario.findOne({
       where: { nombre_usuario: decodedToken.nombre_usuario },
     });
@@ -190,36 +227,51 @@ const actualizarPerfil = async (req, res) => {
         .json({ mensaje: " P002 - E002 Usuario no encontrado", decodedToken });
     }
 
-    // Actualiza los campos del perfil
-    usuario.nombre_usuario = nombre || usuario.nombre_usuario;
-    usuario.email = email || usuario.email;
+    // Registra los cambios realizados
+    const cambiosRealizados = {};
+
+    // Actualiza los campos del perfil y registra cambios
+    if (nombre && nombre !== usuario.nombre_usuario) {
+      cambiosRealizados.nombre_usuario = { antes: usuario.nombre_usuario, despues: nombre };
+      usuario.nombre_usuario = nombre;
+    }
+
+    if (email && email !== usuario.email) {
+      cambiosRealizados.email = { antes: usuario.email, despues: email };
+      usuario.email = email;
+    }
 
     // Actualiza la contraseña si se proporciona una nueva
     if (nuevaContrasena) {
       const hashedContrasena = await bcrypt.hash(nuevaContrasena, 10);
+      cambiosRealizados.contrasena = { antes: "****", despues: "****" }; // No muestres contraseñas reales
       usuario.contrasena = hashedContrasena;
     }
 
     // Guarda los cambios en la base de datos
     await usuario.save();
 
-    res.json({ mensaje: "Perfil actualizado con éxito" });
+    res.json({
+      mensaje: "Perfil actualizado con éxito",
+      cambios: cambiosRealizados,
+    });
   } catch (error) {
     console.error("Error al actualizar el perfil:", error);
     if (error.name === "SequelizeUniqueConstraintError") {
       if (error.fields.nombre_usuario) {
         return res
           .status(400)
-          .json({ mensaje: " P002 - E002El nombre de usuario ya está en uso" });
+          .json({ mensaje: " El nombre de usuario ya está en uso" });
       } else if (error.fields.email) {
         return res
           .status(400)
-          .json({ mensaje: " P002 - E002 El correo electrónico ya está en uso" });
+          .json({ mensaje: "  El correo electrónico ya está en uso" });
       }
     }
-    res.status(500).json({ mensaje: " P002 - E002 Error al actualizar el perfil" });
+    res.status(500).json({ mensaje: " Por favor, ingrese un correo electrónico válido" });
   }
 };
+
 
 const actualizarEstadoUsuario = async (req, res = response) => {
   const { id_usuario } = req.params;

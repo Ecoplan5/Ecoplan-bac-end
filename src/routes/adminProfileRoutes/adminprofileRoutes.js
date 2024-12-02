@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const verificarToken = require('../middlewares/verificarToken');
+const verificarToken = require('../middlewares/verificarToken');  // Middleware para verificar el token
 
-const { subirImagenAdmin, subirImagenEmpleado } = require('../../controllers/adminProfile/adminProfileController');
+// Controlador para actualizar el avatar
+const {     subirImagenAvatar,
+} = require('../../controllers/adminProfile/adminProfileController');
 
-// Ruta para subir la imagen del administrador
-router.post('/admin-profile', verificarToken, subirImagenAdmin);
-
-// Ruta para subir la imagen del empleado
-router.post('/empleado-profile', subirImagenEmpleado, verificarToken);
+// Ruta para actualizar el avatar de un usuario
+// Esta ruta requiere el token de autenticación para asegurar que el usuario está autenticado
+router.post('/actualizarAvatar', verificarToken,     subirImagenAvatar,
+);
 
 module.exports = router;

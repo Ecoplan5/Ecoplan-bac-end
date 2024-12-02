@@ -51,9 +51,11 @@ const eliminarImagenAnterior = (rutaImagen) => {
 };
 
 // Función para subir imagen del administrador
-const subirImagenAdmin = (req, res) => {
+const subirImagenAvatar = (req, res) => {
+    console.log('Solicitud recibida en subirImagenAvatar'); // Depuración
     upload.single('foto')(req, res, async (err) => {
         if (err) {
+            console.error('Error de Multer:', err); // Depuración
             return res.status(400).json({ error: err.message });
         }
 
@@ -74,7 +76,7 @@ const subirImagenAdmin = (req, res) => {
             await usuario.save();
 
             res.json({
-                message: 'Imagen de administrador subida y actualizada con éxito',
+                message: 'Imagen de avatar subida y actualizada con éxito',
                 filePath: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
             });
 
@@ -85,46 +87,9 @@ const subirImagenAdmin = (req, res) => {
     });
 };
 
-// Función para subir imagen del empleado
-const subirImagenEmpleado = (req, res) => {
-    upload.single('foto')(req, res, async (err) => {
-        if (err) {
-            return res.status(400).json({ error: err.message });
-        }
 
-        try {
-            const { id_usuario } = req.body;
-
-            // Buscar el empleado en la base de datos
-            const empleado = await Usuario.findByPk(id_usuario); // Asumimos que los empleados también están en la tabla `Usuario`
-
-            if (!empleado) {
-                return res.status(404).json({ error: 'Empleado no encontrado' });
-            }
-
-            // Eliminar la imagen anterior si existe
-            if (empleado.foto) {
-                eliminarImagenAnterior(empleado.foto);
-            }
-
-            // Guardar la nueva ruta de la imagen en el empleado
-            empleado.foto = req.file.filename;
-            await empleado.save();
-
-            res.json({
-                message: 'Imagen del empleado subida y actualizada con éxito',
-                filePath: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
-            });
-
-        } catch (error) {
-            console.error('Error al subir la imagen del empleado:', error);
-            res.status(500).json({ error: 'Error al subir la imagen del empleado' });
-        }
-    });
-};
 
 
 module.exports = {
-    subirImagenAdmin,
-    subirImagenEmpleado
+    subirImagenAvatar,
 };
