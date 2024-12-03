@@ -109,7 +109,7 @@ class Server {
 
     routes() {
         this.app.use(this.path, require('../routes/usuariosRoutes/usuariosRoute'));
-        this.app.use(this.path, require('../routes/rolesRoutes/rolRoute'));
+        this.app.use(this.path, require('../routes/huellasRoutes/huellasRoutes'));
 
 
         this.app.post(`${this.path}/login`, iniciarSesion);

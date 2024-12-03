@@ -1,5 +1,4 @@
 const { DataTypes } = require('sequelize');
-const Rol = require('../rolesModel/rolesModel');
 
 const { sequelize } = require('../../../database/config');
 

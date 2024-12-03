@@ -8,7 +8,7 @@ const sequelize = new Sequelize({
     port:  3306, 
     username: 'root',  
     password:  '',  
-    database: 'Ecoplan',  
+    database: 'ecoplan1',  
 });
 
 sequelize
