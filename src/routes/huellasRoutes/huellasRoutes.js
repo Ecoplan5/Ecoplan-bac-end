@@ -8,7 +8,7 @@ const { getHuellas,  getHuellaById ,createHuella} = require('../../controllers/h
 route.get('/huellas', getHuellas);
 
 // Obtener  la  huella por id 
-route.get('/obtener/:id_huella', getHuellaById);
+route.get('/huellas/:id', getHuellaById);
 
 // Crear una nueva  huella
 route.post('/huellas', createHuella);

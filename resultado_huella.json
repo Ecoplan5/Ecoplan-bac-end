@@ -1,0 +1,29 @@
+{
+    "resultado_huella": {
+        "vehiculo": {
+            "descripcion": "Kilómetros diarios: 20.0 km",
+            "emision_por_km": "0.245 kg CO₂/km",
+            "emision_total": 4.9
+        },
+        "transporte_publico": {
+            "descripcion": "Kilómetros recorridos en metro: 10.0 km",
+            "emision_por_km": "0.02 kg CO₂/km",
+            "emision_total": 0.2
+        },
+        "aviacion": {
+            "descripcion": "Vuelo de Bogotá a Manizales",
+            "distancia_km": 3920.637173056182,
+            "emision_por_km": "0.25 kg CO₂/km",
+            "emision_total": 980.1592932640455
+        },
+        "electricidad": {
+            "descripcion": "Consumo de electricidad: 150.5 kWh",
+            "emision_por_kWh": "0.92 kg CO₂/kWh",
+            "emision_total": 138.46
+        },
+        "total": {
+            "descripcion": "Suma total de todas las emisiones de carbono",
+            "emision_total": 1123.7192932640455
+        }
+    }
+}

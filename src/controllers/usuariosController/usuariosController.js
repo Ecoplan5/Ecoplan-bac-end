@@ -22,7 +22,7 @@ const getUsuarios = async (req, res = response) => {
 
 
 const getUsuarioByd = async (req, res = response) => {
-  const {id_usuario } = req.params;
+  const { id_usuario } = req.params;
 
   try {
     const usuario = await Usuario.findByPk(id_usuario);
@@ -45,19 +45,29 @@ const getUsuarioByd = async (req, res = response) => {
   }
 };
 
+
+// Crear un nuevo usuario
 const postUsuario = async (req, res = response) => {
   const { nombre_usuario, contrasena, email, foto } = req.body;
-  console.log(req.body);  // Verifica que id_rol esté presente
+
+  console.log(req.body); // Verifica que se recibe la solicitud correctamente
 
   try {
-    // Verificar si el usuario ya existe
+    // Verificar si el correo electrónico ya existe
     const usuarioExistente = await Usuario.findOne({ where: { email } });
-    console.log('Usuario encontrado:', usuarioExistente);
-    
     if (usuarioExistente) {
       return res.status(400).json({
         success: false,
-        error: 'El correo electrónico ya está en uso.'
+        mensaje: 'El correo electrónico ya está en uso.'
+      });
+    }
+
+    // Verificar si el nombre de usuario ya existe
+    const nombreUsuarioExistente = await Usuario.findOne({ where: { nombre_usuario } });
+    if (nombreUsuarioExistente) {
+      return res.status(400).json({
+        success: false,
+        mensaje: 'El nombre de usuario ya está en uso.'
       });
     }
 
@@ -73,61 +83,33 @@ const postUsuario = async (req, res = response) => {
       foto,
     });
 
-    res.status(201).json({
+    // Responder con éxito
+    return res.status(201).json({
       success: true,
-      message: 'Usuario creado con éxito.',
-      usuario: nuevoUsuario
+      mensaje: 'Usuario creado con éxito.',
+      usuario: nuevoUsuario,
     });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
+    // Capturar errores específicos de Sequelize
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({
+        success: false,
+        mensaje: `El campo ${error.errors[0].path} ya está en uso.`,
+      });
+    }
+
+    // Capturar otros errores
+    console.error(error); // Para depuración
+    return res.status(500).json({
       success: false,
-      error: 'Error al crear el usuario.'
+      mensaje: 'Ocurrió un error al procesar la solicitud. Inténtalo más tarde.',
     });
   }
 };
 
 
-// // Crear un nuevo usuario
-// const postUsuario = async (req, res = response) => {
-//   const { nombre_usuario, contrasena, email, foto } = req.body;
-//   console.log(req.body);  // Verifica que id_rol esté presente
 
-//   try {
-//     // Verificar si el usuario ya existe
-//     const usuarioExistente = await Usuario.findOne({ where: { email } });
-//     if (usuarioExistente) {
-//       return res.status(400).json({
-//         success: false,
-//         error: 'El correo electrónico ya está en uso.'
-//       });
-//     }
-
-//     // Encriptar la contraseña
-//     const salt = await bcrypt.genSalt(10);
-//     const contrasenaEncriptada = await bcrypt.hash(contrasena, salt);
-
-//     // Crear el nuevo usuario incluyendo el campo id_rol
-//     const nuevoUsuario = await Usuario.create({
-//       nombre_usuario,
-//       contrasena: contrasenaEncriptada,
-//       email,
-//       foto,
-//     });
-
-//     res.status(201).json({
-//       success: true,
-//       message: 'Usuario creado con éxito.',
-//       usuario: nuevoUsuario
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({
-//       success: false,
-//       error: 'Error al crear el usuario.'
-//     });
-//   }
-// };
 
 
 const putUsuario = async (req, res = response) => {
@@ -184,7 +166,7 @@ const putUsuario = async (req, res = response) => {
 
 
 const deleteUsuario = async (req, res = response) => {
-  const { id_usuario} = req.params;
+  const { id_usuario } = req.params;
 
   try {
     const usuario = await Usuario.findByPk(id_usuario);
