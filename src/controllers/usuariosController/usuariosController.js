@@ -46,28 +46,19 @@ const getUsuarioByd = async (req, res = response) => {
 };
 
 
-// Crear un nuevo usuario
+
 const postUsuario = async (req, res = response) => {
   const { nombre_usuario, contrasena, email, foto } = req.body;
 
-  console.log(req.body); // Verifica que se recibe la solicitud correctamente
-
   try {
-    // Verificar si el correo electrónico ya existe
+    // Verificar si el usuario ya existe
     const usuarioExistente = await Usuario.findOne({ where: { email } });
+    console.log('Usuario encontrado:', usuarioExistente);
+    
     if (usuarioExistente) {
       return res.status(400).json({
         success: false,
-        mensaje: 'El correo electrónico ya está en uso.'
-      });
-    }
-
-    // Verificar si el nombre de usuario ya existe
-    const nombreUsuarioExistente = await Usuario.findOne({ where: { nombre_usuario } });
-    if (nombreUsuarioExistente) {
-      return res.status(400).json({
-        success: false,
-        mensaje: 'El nombre de usuario ya está en uso.'
+        error: 'El correo electrónico ya está en uso.'
       });
     }
 
@@ -83,31 +74,19 @@ const postUsuario = async (req, res = response) => {
       foto,
     });
 
-    // Responder con éxito
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
-      mensaje: 'Usuario creado con éxito.',
-      usuario: nuevoUsuario,
+      message: 'Usuario creado con éxito.',
+      usuario: nuevoUsuario
     });
-
   } catch (error) {
-    // Capturar errores específicos de Sequelize
-    if (error.name === 'SequelizeUniqueConstraintError') {
-      return res.status(400).json({
-        success: false,
-        mensaje: `El campo ${error.errors[0].path} ya está en uso.`,
-      });
-    }
-
-    // Capturar otros errores
-    console.error(error); // Para depuración
-    return res.status(500).json({
+    console.error(error);
+    res.status(500).json({
       success: false,
-      mensaje: 'Ocurrió un error al procesar la solicitud. Inténtalo más tarde.',
+      error: 'Error al crear el usuario.'
     });
   }
 };
-
 
 
 
